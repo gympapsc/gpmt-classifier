@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: gpmt-classifier
+    namespace: "analysis"
+spec:
+    selector:
+        matchLabels:
+            app: gpmt-classifier
+    template:
+        metadata:
+            labels:
+                app: gpmt-classifier
+        spec:
+            containers:
+            - name: gpmt-classifier
+              image: hakrac/gpmt-classifier:latest
+              imagePullPolicy: Always
+              env:
+              - name: PORT
+                value: "80"
+              ports:
+              - containerPort: 80
