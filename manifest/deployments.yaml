@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
     name: gpmt-classifier
-    namespace: "analysis"
+    namespace: "default"
 spec:
     selector:
         matchLabels:
@@ -19,5 +19,14 @@ spec:
               env:
               - name: PORT
                 value: "80"
+              - name: MONGO_URL
+                value: "gpmt-mongodb.default.svc.cluster.local"
               ports:
               - containerPort: 80
+              volumeMounts:
+              - name: "gpmt-model"
+                mountPath: /data/gpmt-model
+            volumes:
+            - name: gpmt-model
+              persistentVolumeClaim:
+                claimName: gpmt-model-pvc

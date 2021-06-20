@@ -1,7 +1,14 @@
 from flask import Flask, request
+import pymongo
 import os
 
 app = Flask(__name__)
+
+client = pymongo.MongoClient(os.environ["MONGO_URL"])
+if "gpmt" in client.list_database_names():
+    gpmt_db = client["gpmt"]
+else:
+    print("No GPMT Database found")
 
 @app.route("/")
 def index():
