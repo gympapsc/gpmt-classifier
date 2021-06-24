@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: gpmt-classifier
+    name: gpmt-net
     namespace: "default"
 spec:
     selector:
         matchLabels:
-            app: gpmt-classifier
+            app: gpmt-net
     template:
         metadata:
             labels:
-                app: gpmt-classifier
+                app: gpmt-net
         spec:
             containers:
-            - name: gpmt-classifier
-              image: hakrac/gpmt-classifier:latest
+            - name: gpmt-net
+              image: hakrac/gpmt-net:latest
               imagePullPolicy: Always
               env:
               - name: PORT
@@ -24,9 +24,14 @@ spec:
               ports:
               - containerPort: 80
               volumeMounts:
+              - name: "gpmt-photo"
+                mountPath: /data/gpmt-photo
               - name: "gpmt-model"
                 mountPath: /data/gpmt-model
             volumes:
             - name: gpmt-model
               persistentVolumeClaim:
                 claimName: gpmt-model-pvc
+            - name: gpmt-photo
+              persistentVolumeClaim:
+                claimName: gpmt-photo-pvc
