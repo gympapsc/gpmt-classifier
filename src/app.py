@@ -92,7 +92,8 @@ def micturition_forecast():
         "forecast": [
             { "prediction": random.random(), "date": now + timedelta(hours=i), "user": user_id }
             for i in range(25)
-        ]
+        ],
+        "micturitionFrequency": random.random() * 3
     }
 
 
