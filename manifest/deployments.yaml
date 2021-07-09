@@ -14,24 +14,17 @@ spec:
         spec:
             containers:
             - name: gpmt-net
-              image: hakrac/gpmt-net:latest
+              image: gpmtcontainerregistry.azurecr.io/gpmt-api
               imagePullPolicy: Always
               env:
               - name: PORT
                 value: "80"
               - name: MONGO_URL
-                value: "gpmt-mongodb.default.svc.cluster.local"
+                valueFrom:
+                  secretKeyRef:
+                    name: cosmosdb
+                    key: url
               ports:
               - containerPort: 80
-              volumeMounts:
-              - name: "gpmt-photo"
-                mountPath: /data/gpmt-photo
-              - name: "gpmt-model"
-                mountPath: /data/gpmt-model
-            volumes:
-            - name: gpmt-model
-              persistentVolumeClaim:
-                claimName: gpmt-model-pvc
-            - name: gpmt-photo
-              persistentVolumeClaim:
-                claimName: gpmt-photo-pvc
+            imagePullSecrets:
+            - name: "registry-token"

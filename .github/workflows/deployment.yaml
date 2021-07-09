@@ -1,0 +1,77 @@
+on: [release, push]
+
+name: Deployment to AKS
+
+env:
+  CLUSTER_NAME: GPMTCluster
+  RESOURCE_GROUP: GPMTResourceGroup
+  REGISTRY_SECRET_NAME: registry-token
+  VERSION: v1
+
+jobs:
+  build:
+    name: Build and push container to ACR
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: ACR login
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    
+    - name: Build `gpmt-net` container
+      run: docker build ./ -t ${{ secrets.REGISTRY_USERNAME }}.azurecr.io/gpmt-net
+    
+    - name: Push `gpmt-net` container
+      run: docker push ${{ secrets.REGISTRY_USERNAME}}.azurecr.io/gpmt-net
+
+  deployment:
+    name: "Deploy to AKS"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set AKS cluster
+      uses: azure/aks-set-context@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: ${{ env.CLUSTER_NAME }}
+        resource-group: ${{ env.RESOURCE_GROUP }}
+      
+    - name: Create k8s registry secret
+      uses: azure/k8s-create-secret@v1
+      with:
+        container-registry-url: ${{ env.REGISTRY_USERNAME }}.azurecr.io
+        container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
+        container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+        secret-name: ${{ env.REGISTRY_SECRET_NAME }}
+        namespace: "default"
+
+    - name: Create k8s cosmos secret
+      uses: azure/k8s-create-secret@v1
+      with:
+        secret-type: 'generic'
+        arguments:  --from-literal=url=${{ secrets.COSMOS_URL }}
+        secret-name: cosmosdb
+        namespace: "default"
+
+    - name: Create k8s cosmos secret
+      uses: azure/k8s-create-secret@v1
+      with:
+        secret-type: 'generic'
+        arguments:  --from-literal=url=${{ secrets.COSMOS_URL }}
+        secret-name: cosmosdb
+        namespace: "default"
+    
+    - name: Deploy analysis service
+      uses: azure/k8s-deploy@v1
+      with:
+        manifests: |
+            manifest/deployments.yaml
+            manifest/services.yaml
+        imagepullsecrets: |
+            ${{ env.REGISTRY_SECRET_NAME }}
+        namespace: "default"
