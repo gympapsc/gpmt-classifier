@@ -42,7 +42,7 @@ def index():
 def photo_classification():
     user_id = request.args.get("user_id")
     return {
-        "user_id": user_id
+        "user_id": user_id,
         "classification": "testClassification"
     }
 
