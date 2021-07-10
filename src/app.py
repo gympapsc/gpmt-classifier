@@ -38,6 +38,14 @@ def index():
         "surname": user["surname"]
     }
 
+@app.route("/photo")
+def photo_classification():
+    user_id = request.args.get("user_id")
+    return {
+        "user_id": user_id
+        "classification": "testClassification"
+    }
+
 @app.route("/micturition")
 def micturition_forecast():
     user_id = request.args.get("user_id")
