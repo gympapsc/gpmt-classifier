@@ -1,4 +1,4 @@
-on: [release]
+on: [release, push]
 
 name: Deployment to Azure Kubernetes Service
 
@@ -8,9 +8,27 @@ env:
   REGISTRY_SECRET_NAME: registry-token
 
 jobs:
+
+  test:
+    name: Test container
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: ACR login
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    
+    - name: Test `gpmt-net`
+    - run: docker compose up --exit-code-from gpmt-net
+
   build:
     name: Build and push container to ACR
     runs-on: ubuntu-latest
+    needs: test
     steps:
     - uses: actions/checkout@v2
 
@@ -58,6 +76,14 @@ jobs:
         secret-name: cosmosdb
         namespace: "default"
     
+    - name: Create k8s azure storage secret
+      uses: azure/k8s-create-secret@v1
+      with:
+        secret-type: 'generic'
+        arguments:  --from-literal=url=${{ secrets.STORAGE_CONNECTION_URL }}
+        secret-name: azure-storage
+        namespace: "default"
+        
     - name: Deploy analysis service
       uses: azure/k8s-deploy@v1
       with:
