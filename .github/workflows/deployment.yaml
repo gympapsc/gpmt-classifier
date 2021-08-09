@@ -1,4 +1,4 @@
-on: [release, push]
+on: [release]
 
 name: Deployment to Azure Kubernetes Service
 
