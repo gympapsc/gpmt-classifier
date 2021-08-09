@@ -1,4 +1,4 @@
-on: [release, push]
+on: [release]
 
 name: Deployment to Azure Kubernetes Service
 
@@ -24,6 +24,11 @@ jobs:
     
     - name: Test `gpmt-net`
       run: docker-compose -f manifest/docker-compose.yml up --exit-code-from gpmt-net
+    
+    - uses: actions/upload-artifact@v2
+      with:
+        name: coverage
+        path: /coverage
 
   build:
     name: Build and push container to ACR
