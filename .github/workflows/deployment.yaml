@@ -23,7 +23,7 @@ jobs:
         password: ${{ secrets.REGISTRY_PASSWORD }}
     
     - name: Test `gpmt-net`
-      run: docker-compose up --exit-code-from gpmt-net
+      run: docker-compose -f manifest/docker-compose.yml up --exit-code-from gpmt-net
 
   build:
     name: Build and push container to ACR
