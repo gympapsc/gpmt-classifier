@@ -23,7 +23,7 @@ jobs:
         password: ${{ secrets.REGISTRY_PASSWORD }}
     
     - name: Test `gpmt-net`
-      run: docker-compose -f manifest/docker-compose.yml up --exit-code-from gpmt-net
+      run: docker-compose -f docker-compose.yml up --exit-code-from gpmt-net
     
     - uses: actions/upload-artifact@v2
       with:
