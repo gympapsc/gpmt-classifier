@@ -38,7 +38,7 @@ def index():
         "surname": user["surname"]
     }
 
-@app.route("/photo")
+@app.route("/photo/classification", methods=["POST"])
 def photo_classification():
     user_id = request.args.get("user_id")
     return {
@@ -46,7 +46,7 @@ def photo_classification():
         "classification": "testClassification"
     }
 
-@app.route("/micturition")
+@app.route("/forecast/micturition", methods=["POST"])
 def micturition_forecast():
     user_id = request.args.get("user_id")
 
@@ -107,6 +107,23 @@ def micturition_forecast():
         "micturitionFrequency": random.random() * 3
     }
 
+
+@app.route("/drinking")
+def drinking_stats():
+    user_id = request.args.get("user_id")
+
+    end = datetime.now()
+    start = end - timedelta(7)
+
+    drinkingEntries = drinking.find({
+        "user": ObjectId(user_id),
+        "date": {
+            "$gte": start,
+            "$lte": end
+        }
+    })
+
+    print(drinkingEntries)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=os.environ["PORT"])
