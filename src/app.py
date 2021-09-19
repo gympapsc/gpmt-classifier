@@ -21,7 +21,7 @@ if "gpmt" in client.list_database_names():
 
     micturition = gpmt_db["Micturition"]
     stress = gpmt_db["Stress"]
-    drinking = gpmt_db["Drinking"]
+    hydration = gpmt_db["Hydration"]
     users = gpmt_db["Users"]
 else:
     print("No GPMT Database found")
@@ -65,7 +65,7 @@ def micturition_forecast():
         }
     })
 
-    drinkingEntries = drinking.find({
+    hydrationEntries = hydration.find({
         "user": ObjectId(user_id),
         "date": {
             "$gte": start,
@@ -83,7 +83,7 @@ def micturition_forecast():
 
     # forecast = predictor.forecast_micturition(
     #     micturition=micturitionEntries,
-    #     drinking=drinkingEntries,
+    #     hydration=hydrationEntries,
     #     stress=stressEntries,
     #     user=user,
     # )
@@ -108,14 +108,14 @@ def micturition_forecast():
     }
 
 
-@app.route("/drinking")
-def drinking_stats():
+@app.route("/hydration")
+def hydration_stats():
     user_id = request.args.get("user_id")
 
     end = datetime.now()
     start = end - timedelta(7)
 
-    drinkingEntries = drinking.find({
+    hydrationEntries = hydration.find({
         "user": ObjectId(user_id),
         "date": {
             "$gte": start,
@@ -123,7 +123,7 @@ def drinking_stats():
         }
     })
 
-    print(drinkingEntries)
+    print(hydrationEntries)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=os.environ["PORT"])
